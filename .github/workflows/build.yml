@@ -1,0 +1,46 @@
+name: Build Kivy APK
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            git zip unzip openjdk-17-jdk python3-pip \
+            python3-setuptools python3-wheel python3-virtualenv \
+            libtool libffi-dev libssl-dev \
+            libsqlite3-dev zlib1g-dev libc6-dev libncurses5-dev \
+            libstdc++6 libjpeg-dev libfreetype6-dev
+
+      - name: Install Buildozer
+        run: |
+          pip install --upgrade pip setuptools
+          pip install buildozer
+
+      - name: Initialize Buildozer
+        run: |
+          buildozer android clean
+          buildozer android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: attendance-app-apk
+          path: bin/*.apk
