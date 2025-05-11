@@ -36,6 +36,9 @@ jobs:
           pip install --upgrade pip setuptools
           pip install cython virtualenv
           pip install buildozer
+          
+      - name: Setup Android SDK
+        run: ./setup_android_sdk.sh
 
       - name: Install Android SDK (in legacy location)
         run: |
