@@ -30,7 +30,7 @@ jobs:
             libstdc++6 libjpeg-dev libfreetype6-dev \
             ccache autoconf automake cmake pkg-config
 
-      - name: Install Buildozer
+      - name: Install Python dependencies
         run: |
           pip install --upgrade pip setuptools
           pip install cython virtualenv
@@ -44,8 +44,9 @@ jobs:
           echo "ANDROIDAPI=33" >> $GITHUB_ENV
           echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
 
-      - name: Build APK with Buildozer
+      - name: Initialize and build with Buildozer
         run: |
+          buildozer android update
           buildozer android clean
           buildozer android debug
 
