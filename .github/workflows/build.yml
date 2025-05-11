@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11.10
+          python-version: 3.11
 
       - name: Install system dependencies
         run: |
@@ -25,32 +25,28 @@ jobs:
           sudo apt install -y \
             git zip unzip openjdk-17-jdk python3-pip \
             python3-setuptools python3-wheel python3-virtualenv \
-            libtool libffi-dev libssl-dev \
-            libsqlite3-dev zlib1g-dev libc6-dev libncurses5-dev \
-            libstdc++6 libjpeg-dev libfreetype6-dev \
-            ccache autoconf automake cmake pkg-config
+            libtool libffi-dev libssl-dev libsqlite3-dev \
+            zlib1g-dev libc6-dev libncurses5-dev libstdc++6 \
+            libjpeg-dev libfreetype6-dev \
+            ccache autoconf automake cmake pkg-config \
+            xvfb
 
-      - name: Install Python dependencies
+      - name: Install Python & Buildozer
         run: |
           pip install --upgrade pip setuptools
           pip install cython virtualenv
           pip install buildozer
 
-      - name: Set environment variables
+      - name: Install Android build tools
         run: |
-          echo "PATH=$PATH:$HOME/.buildozer/android/platform/apache-ant-1.9.4/bin" >> $GITHUB_ENV
-          echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
-          echo "ANDROIDAPI=33" >> $GITHUB_ENV
-          echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=${HOME}/.buildozer/android/platform/android-sdk \
+            "build-tools;33.0.2"
 
-      - name: Initialize and build with Buildozer
+      - name: Build APK using xvfb-run
         run: |
-          buildozer android update
-          buildozer android clean
-          buildozer android debug
+          xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' buildozer android debug
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: attendance-app-apk
