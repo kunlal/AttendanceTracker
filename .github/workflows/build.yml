@@ -29,7 +29,7 @@ jobs:
             zlib1g-dev libc6-dev libncurses5-dev libstdc++6 \
             libjpeg-dev libfreetype6-dev \
             ccache autoconf automake cmake pkg-config \
-            xvfb
+            xvfb wget
 
       - name: Install Python & Buildozer
         run: |
@@ -37,7 +37,17 @@ jobs:
           pip install cython virtualenv
           pip install buildozer
 
-      - name: Build APK using xvfb-run
+      - name: Install Android cmdline-tools and build-tools
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
+          cd $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          mv cmdline-tools latest
+          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk \
+            "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+      - name: Build APK using xvfb
         run: |
           xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' buildozer android debug
 
