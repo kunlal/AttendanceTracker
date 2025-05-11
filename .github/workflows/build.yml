@@ -37,25 +37,17 @@ jobs:
           pip install cython virtualenv
           pip install buildozer
 
-      - name: Install Android SDK cmdline-tools and build-tools
+      - name: Install Android SDK (in legacy location)
         run: |
           SDK_DIR=$HOME/.buildozer/android/platform/android-sdk
-          mkdir -p "$SDK_DIR/cmdline-tools"
-          cd "$SDK_DIR/cmdline-tools"
+          mkdir -p "$SDK_DIR/tools"
+          cd "$SDK_DIR"
           wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
           unzip cmdline-tools.zip -d temp
-          mv temp/cmdline-tools latest
+          mv temp/cmdline-tools "$SDK_DIR/tools"
 
-          # Install platform tools and build tools
-          yes | "$SDK_DIR/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$SDK_DIR" \
+          yes | "$SDK_DIR/tools/bin/sdkmanager" --sdk_root="$SDK_DIR" \
             "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-
-      - name: Set environment paths
-        run: |
-          echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
-          echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/platform-tools" >> $GITHUB_ENV
 
       - name: Build APK using xvfb
         run: |
