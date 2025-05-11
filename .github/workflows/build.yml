@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -31,26 +31,17 @@ jobs:
             ccache autoconf automake cmake pkg-config \
             xvfb wget
 
-      - name: Install Python & Buildozer
+      - name: Install Python packages & Buildozer
         run: |
           pip install --upgrade pip setuptools
           pip install cython virtualenv
           pip install buildozer
-          
+
+      - name: Grant execute permissions to setup script
+        run: chmod +x setup_android_sdk.sh
+
       - name: Setup Android SDK
         run: ./setup_android_sdk.sh
-
-      - name: Install Android SDK (in legacy location)
-        run: |
-          SDK_DIR=$HOME/.buildozer/android/platform/android-sdk
-          mkdir -p "$SDK_DIR/tools"
-          cd "$SDK_DIR"
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d temp
-          mv temp/cmdline-tools "$SDK_DIR/tools"
-
-          yes | "$SDK_DIR/tools/bin/sdkmanager" --sdk_root="$SDK_DIR" \
-            "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
       - name: Build APK using xvfb
         run: |
@@ -59,5 +50,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: attendance-app-apk
+          name: kivy-app-apk
           path: bin/*.apk
