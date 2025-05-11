@@ -41,6 +41,7 @@ requirements = python3,kivy,plyer
 android.permissions = RECEIVE_BOOT_COMPLETED
 
 # Add required Android APIs
+android.api = 33
 android.build_tools = 33.0.2
 android.api = 33
 android.minapi = 21
