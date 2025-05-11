@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-            python-version: 3.11.10
+          python-version: 3.11.10
 
       - name: Install system dependencies
         run: |
@@ -27,14 +27,24 @@ jobs:
             python3-setuptools python3-wheel python3-virtualenv \
             libtool libffi-dev libssl-dev \
             libsqlite3-dev zlib1g-dev libc6-dev libncurses5-dev \
-            libstdc++6 libjpeg-dev libfreetype6-dev
+            libstdc++6 libjpeg-dev libfreetype6-dev \
+            ccache autoconf automake cmake pkg-config
 
       - name: Install Buildozer
         run: |
           pip install --upgrade pip setuptools
+          pip install cython virtualenv
           pip install buildozer
 
-      - name: Initialize Buildozer
+      - name: Set environment variables
+        run: |
+          echo "PATH=$PATH:$HOME/.buildozer/android/platform/apache-ant-1.9.4/bin" >> $GITHUB_ENV
+          echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
+          echo "ANDROIDAPI=33" >> $GITHUB_ENV
+          echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
+
+      - name: Build APK with Buildozer
         run: |
           buildozer android clean
           buildozer android debug
