@@ -1,54 +1,50 @@
-name: Build Kivy APK
+on: [push, pull_request]
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+env:
+  PYTHONFORANDROID_PREREQUISITES_INSTALL_INTERACTIVE: 0
 
+name: Android Integration
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  Integration:
+    strategy:
+      matrix:
+        os:
+          - 'ubuntu-latest'
+          - 'macOs-latest'
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            git zip unzip openjdk-17-jdk python3-pip \
-            python3-setuptools python3-wheel python3-virtualenv \
-            libtool libffi-dev libssl-dev libsqlite3-dev \
-            zlib1g-dev libc6-dev libncurses5-dev libstdc++6 \
-            libjpeg-dev libfreetype6-dev \
-            ccache autoconf automake cmake pkg-config \
-            xvfb wget
-
-      - name: Install Python packages & Buildozer
-        run: |
-          pip install --upgrade pip setuptools
-          pip install cython virtualenv
-          pip install buildozer
-
-      - name: Grant execute permissions to setup script
-        run: chmod +x setup_android_sdk.sh
-
-      - name: Setup Android SDK
-        run: ./setup_android_sdk.sh
-
-      - name: Build APK using xvfb
-        run: |
-          xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' buildozer android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: kivy-app-apk
-          path: bin/*.apk
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - uses: actions/checkout@v4
+    - name: Setup environment
+      run: |
+        pip install .
+    - run: buildozer --help
+    - run: buildozer init
+    - name: SDK, NDK and p4a download
+      run: |
+        sed -i.bak "s/# android.accept_sdk_license = False/android.accept_sdk_license = True/" buildozer.spec
+        sed -i.bak "s/#p4a.branch = master/p4a.branch = develop/" buildozer.spec
+        buildozer android p4a -- --help
+    # Install OS specific dependencies
+    - name: Install Linux dependencies
+      if: matrix.os == 'ubuntu-latest'
+      # Required by some p4a recipes, but not
+      # installed by p4a on Linux.
+      run: sudo apt -y install automake        
+    - name: Debug Build
+      run: |
+        touch main.py
+        buildozer android debug
+    - name: Release Build (aab)
+      run: |
+        touch main.py
+        export BUILDOZER_ALLOW_ORG_TEST_DOMAIN=1
+        buildozer android release
