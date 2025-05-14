@@ -1,22 +1,22 @@
 [app]
 
 # (str) Title of your application
-title = Attendance Tracker
+title = Attendabce Tracker
 
 # (str) Package name
-package.name = AttendanceTracker
+package.name = Attendance
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.kundantech
+package.domain = org.AttendanceTRK
 
 # (str) Source code where the main.py live
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,json
+source.include_exts = py,png,jpg,kv,atlas
 
 # (list) List of inclusions using pattern matching
-#source.include_patterns = assets/*,images/*.png
+source.include_patterns = *.png
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -37,17 +37,17 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,pytz,datetime,plyer,time,threading,calendar
+requirements = python3,kivy==2.3.1,kivymd==1.2.0,pillow==10.3.0
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
- ments.source.kivy = ../../kivy
+# requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/attendance.jpg
+presplash.filename = %(source.dir)s/images/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/attdt.jpg
+icon.filename = %(source.dir)s/images/favicon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
@@ -64,7 +64,7 @@ orientation = portrait
 # author = © Copyright Info
 
 # change the major version of python used by the app
-osx.python_version = 3
+osx.python_version = 3.10.4
 
 # Kivy version to use
 osx.kivy_version = 2.3.1
@@ -136,7 +136,7 @@ fullscreen = 0
 # agreements. This is intended for automation only. If set to False,
 # the default, you will be shown the license when first running
 # buildozer.
-android.accept_sdk_license = True
+# android.accept_sdk_license = False
 
 # (str) Android entry point, default is ok for Kivy-based app
 #android.entrypoint = org.kivy.android.PythonActivity
@@ -321,7 +321,7 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
@@ -349,7 +349,7 @@ android.allow_backup = True
 #p4a.setup_py = false
 
 # (str) extra command line arguments to pass when invoking pythonforandroid.toolchain
-#p4a.extra_args =
+#p4a.extra_args = --blacklist-requirements=sqlite3,openssl
 
 
 
