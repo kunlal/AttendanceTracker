@@ -43,7 +43,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'  # Using Python 3.10 for compatibility
+          python-version: '3.10'
 
       - name: Upgrade pip and dependencies
         run: |
@@ -53,7 +53,6 @@ jobs:
         run: |
           pip install buildozer cython==0.29.33 git+https://github.com/kivy/plyer.git
           pip install git+https://github.com/kivy/python-for-android.git
-          buildozer android setup
 
       - name: Install Android SDK Tools
         run: |
@@ -72,13 +71,9 @@ jobs:
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH
 
-      - name: Ensure python-for-android directory exists
-        run: |
-          mkdir -p /home/runner/work/AttendanceTracker/AttendanceTracker/.buildozer/android/platform/
-          buildozer android clean
-
       - name: Build with Buildozer
         run: |
+          buildozer android clean
           buildozer -v android debug
 
       - name: Upload APK artifact
