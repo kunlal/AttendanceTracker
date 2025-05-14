@@ -56,10 +56,16 @@ jobs:
           cd "$HOME/android-sdk/cmdline-tools"
           curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip commandlinetools-linux-11076708_latest.zip
-          rm commandlinetools-linux-11076708_latest.zip
+          mv cmdline-tools latest
           export ANDROID_HOME="$HOME/android-sdk"
-          export PATH="$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH"
-          sdkmanager --install "build-tools;34.0.0"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
+
+      - name: Set Android SDK Paths
+        run: |
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH
 
       - name: Build with Buildozer
         run: |
