@@ -92,7 +92,6 @@ jobs:
           sudo apt-get install -y \
             zip \
             unzip \
-            autoconf \
             libtool \
             pkg-config \
             libncurses5-dev \
@@ -130,7 +129,7 @@ jobs:
         id: buildozer
         run: |
           yes | buildozer -v android debug
-        # yes | buildozer -v android release
+          yes | buildozer -v android release
         # run this for generating aab (Android App Bundle) [Required by google play]
 
       # Upload artifacts
