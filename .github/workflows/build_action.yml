@@ -4,70 +4,53 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    runs-on: ubuntu-20.04
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.10.4"
+          python-version: 3.10
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            openjdk-17-jdk \
+            unzip \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo5 \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            build-essential \
+            libstdc++6
           python -m pip install --upgrade pip
-          pip install buildozer cython
-        
-      - name: Install system dependencies
-        run: |
-          sudo apt update && sudo apt install -y python3-pip git zip unzip libffi-dev libssl-dev \
-          libsqlite3-dev libbz2-dev liblzma-dev libncurses5-dev libgdbm-dev libreadline-dev \
-          tk-dev tcl8.6-dev libjpeg-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
-          libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-          libfreetype6-dev build-essential libstdc++6 aidl
-          
-      - name: Enable Universe Repository (just in case)
-        run: |
-          sudo add-apt-repository universe
-          sudo apt update
+          pip install buildozer==1.5.0 Cython==0.29.33
 
-      - name: Install Android SDK Command-Line Tools
-        run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-          unzip commandlinetools-linux-10406996_latest.zip
-          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-
-      - name: Accept Android SDK License
-        run: |
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Install Build-Tools
-        run: |
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0"
-
-      - name: Create Build-Tools Directory
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0
-
-      - name: Copy Aidl to Build-Tools
-        run: |
-          cp /usr/bin/aidl ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
-          chmod 777 ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/aidl
-          
-      - name: Build APK
-        run: buildozer -v android debug
-        
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Set up Android SDK and NDK
+        uses: android-actions/setup-android@v2
         with:
-          name: kivy-app
+          api-level: 29
+          ndk-version: 21.4.7075529
+
+      - name: Build APK with Buildozer
+        run: |
+          echo y | buildozer android debug
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: chatgpt_kivy.apk
           path: bin/*.apk
