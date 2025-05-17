@@ -36,9 +36,6 @@ jobs:
           sudo add-apt-repository universe
           sudo apt update
 
-      - name: Initialize Buildozer
-        run: buildozer init
-
       - name: Build APK
         run: buildozer -v android debug
         
