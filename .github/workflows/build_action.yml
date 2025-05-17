@@ -1,84 +1,43 @@
-name: Android Build
+name: Build Kivy APK
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
-
+    runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10.4"
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt-get install -y \
-            build-essential \
-            git \
-            ffmpeg \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            libunwind-dev \
-            zlib1g-dev \
-            libffi-dev \
-            libssl-dev \
-            adb
+          python -m pip install --upgrade pip
+          pip install buildozer
+        
+      - name: Install system dependencies
+        run: |
+          sudo apt update && sudo apt install -y python3-pip git zip unzip libffi-dev libssl-dev \
+          libsqlite3-dev libbz2-dev liblzma-dev libncurses5-dev libgdbm-dev libreadline-dev \
+          libtk8.6-dev libjpeg-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+          libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev
 
-      - name: Setup Java 17 required by Gradle
-        uses: actions/setup-java@v4
+      - name: Initialize Buildozer
+        run: buildozer init
+
+      - name: Build APK
+        run: buildozer -v android debug
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Upgrade pip and dependencies
-        run: |
-          pip install --upgrade pip setuptools wheel
-
-      - name: Install pip dependencies
-        run: |
-          pip install buildozer cython==0.29.33 git+https://github.com/kivy/plyer.git
-          pip install git+https://github.com/kivy/python-for-android.git
-
-      - name: Install Android SDK Tools
-        run: |
-          mkdir -p "$HOME/android-sdk/cmdline-tools"
-          cd "$HOME/android-sdk/cmdline-tools"
-          curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-          export ANDROID_HOME="$HOME/android-sdk"
-          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH"
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;34.0.0"
-
-      - name: Set Android SDK Paths
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$PATH
-
-      - name: Build with Buildozer
-        run: |
-          buildozer android clean
-          buildozer -v android debug
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
+          name: kivy-app
           path: bin/*.apk
-          retention-days: 3
