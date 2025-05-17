@@ -55,9 +55,6 @@ jobs:
           cp /usr/bin/aidl ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
           chmod 777 ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/aidl
 
-      - name: Initialize Buildozer
-        run: buildozer init || echo "Skipping init, file already exists."
-
       - name: Build APK
         run: buildozer -v android debug
         
