@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10
 
@@ -40,7 +40,7 @@ jobs:
           pip install buildozer==1.5.0 Cython==0.29.33
 
       - name: Set up Android SDK and NDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v4
         with:
           api-level: 29
           ndk-version: 21.4.7075529
@@ -50,7 +50,7 @@ jobs:
           echo y | buildozer android debug
 
       - name: Upload APK as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: chatgpt_kivy.apk
           path: bin/*.apk
