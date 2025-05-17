@@ -36,11 +36,21 @@ jobs:
           sudo add-apt-repository universe
           sudo apt update
 
+      - name: Install Android SDK Command-Line Tools
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+          unzip commandlinetools-linux-10406996_latest.zip
+          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+
       - name: Accept Android SDK License
-        run: echo "y" | sdkmanager --licenses
+        run: echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Install Build-Tools
-        run: sdkmanager "build-tools;31.0.0"
+        run: $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0"
 
       - name: Build APK
         run: buildozer -v android debug
