@@ -47,14 +47,22 @@ jobs:
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
 
       - name: Accept Android SDK License
-        run: echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        run: |
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Install Build-Tools
         run: |
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0"
+
+      - name: Create Build-Tools Directory
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0
+
+      - name: Copy Aidl to Build-Tools
+        run: |
           cp /usr/bin/aidl ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
           chmod 777 ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/aidl
-
+          
       - name: Build APK
         run: buildozer -v android debug
         
