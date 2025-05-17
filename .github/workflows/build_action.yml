@@ -29,7 +29,7 @@ jobs:
           libsqlite3-dev libbz2-dev liblzma-dev libncurses5-dev libgdbm-dev libreadline-dev \
           tk-dev tcl8.6-dev libjpeg-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
           libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-          libfreetype6-dev aidl
+          libfreetype6-dev build-essential libstdc++6 aidl
           
       - name: Enable Universe Repository (just in case)
         run: |
@@ -50,7 +50,13 @@ jobs:
         run: echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Install Build-Tools
-        run: $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0"
+        run: |
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;31.0.0"
+          cp /usr/bin/aidl ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/
+          chmod 777 ~/.buildozer/android/platform/android-sdk/build-tools/31.0.0/aidl
+
+      - name: Initialize Buildozer
+        run: buildozer init || echo "Skipping init, file already exists."
 
       - name: Build APK
         run: buildozer -v android debug
