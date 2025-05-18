@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Use Ubuntu 22.04 LTS
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
@@ -40,6 +40,11 @@ jobs:
             libstdc++6
           python -m pip install --upgrade pip
           pip install buildozer==1.5.0 Cython==0.29.33
+
+      - name: Set JAVA_HOME to Java 17
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
 
       - name: Set up Android SDK and NDK
         uses: android-actions/setup-android@v2
