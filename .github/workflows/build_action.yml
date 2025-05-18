@@ -56,8 +56,28 @@ jobs:
         run: |
           echo y | buildozer android debug
 
-      - name: Upload APK as artifact
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.jks
+
+      - name: Sign APK with apksigner
+        run: |
+          APK_PATH=$(find bin/ -name "*.apk" | head -n 1)
+          echo "Signing $APK_PATH"
+          $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner sign \
+            --ks my-release-key.jks \
+            --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --out signed-app.apk \
+            "$APK_PATH"
+
+      - name: Verify signed APK
+        run: |
+          $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify signed-app.apk
+
+      - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: chatgpt_kivy.apk
-          path: bin/*.apk
+          name: chatgpt_kivy_signed.apk
+          path: signed-app.apk
