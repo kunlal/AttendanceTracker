@@ -5,7 +5,7 @@ package.domain = org.chatgpt
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0
-requirements = python3==3.10.4,kivy==2.3.1,json,calendar,datetime
+requirements = python3==3.10.4,kivy==2.3.1
 android.permissions = INTERNET
 android.api = 29
 android.ndk = 25b
