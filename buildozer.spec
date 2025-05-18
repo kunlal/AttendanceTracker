@@ -13,7 +13,7 @@ requirements = python3,kivy==2.3.1
 
 # Supported Android API/NDK versions
 android.api = 33
-android.ndk = 23b
+android.ndk = 25b
 
 # Supported architectures (Buildozer now handles this automatically)
 # android.arch is deprecated — no need to include
