@@ -1,6 +1,13 @@
-import json
 import os
 
+# ✅ Fix: prevent Kivy from writing to restricted Android path
+kivy_home = os.path.join(os.getcwd(), 'kivy_home')
+os.environ['KIVY_HOME'] = kivy_home
+if not os.path.exists(kivy_home):
+    os.makedirs(kivy_home)
+
+# Rest of your imports
+import json
 import pytz
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -12,12 +19,13 @@ from kivy.uix.popup import Popup
 from datetime import datetime, timedelta
 from kivy.uix.image import Image
 from kivy.uix.slider import Slider
-from kivy.graphics import Color, Rectangle  # For color changes
+from kivy.graphics import Color, Rectangle
 from kivy.uix.progressbar import ProgressBar
 from plyer import notification
 import time
 import threading
 import calendar
+
 
 class AttendanceCalendar(BoxLayout):
     def __init__(self, **kwargs):
