@@ -56,9 +56,17 @@ jobs:
         run: |
           echo y | buildozer android debug
 
+      # Decode the base64-encoded keystore secret and save to file
       - name: Decode keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.jks
+
+      # Check if the keystore looks valid
+      - name: Verify keystore file
+        run: |
+          echo "Keystore file info:"
+          ls -lh my-release-key.jks
+          file my-release-key.jks
 
       - name: Sign APK with apksigner
         run: |
