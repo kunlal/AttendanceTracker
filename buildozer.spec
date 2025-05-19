@@ -8,25 +8,21 @@ version = 1.0
 
 requirements = python3,kivy==2.3.1
 
-# (No permissions needed, since your app doesn't require any)
-# android.permissions = 
-
-# Supported Android API/NDK versions
-android.api = 33
-android.ndk = 25b
-
-# Supported architectures (Buildozer now handles this automatically)
-# android.arch is deprecated — no need to include
-
-# Ensure log output for debugging
-log_level = 2
-
-# Include source files in the APK
-copy_to_apk = 1
-
-# Optionally include this if you use .kv or assets
-# (already covered by source.include_exts)
-
-# Build config
 orientation = portrait
 fullscreen = 0
+log_level = 2
+
+android.api = 33
+android.ndk = 25b
+android.minapi = 21
+
+# Use OpenGL ES2 for compatibility across devices
+android.opengl = gles2
+
+# Force software GL backend if GPU compatibility is an issue (optional fallback)
+# Comment out by default unless you're hitting GL issues:
+# environment variables set before Kivy loads
+# p4a.environ = KIVY_GL_BACKEND=angle_sdl2
+
+# Reduce unnecessary packaging issues
+copy_to_apk = 1
