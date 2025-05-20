@@ -6,6 +6,17 @@ import threading
 import calendar
 from datetime import datetime, timedelta
 
+# Disable icon copying to avoid Android permission error
+os.environ["KIVY_NO_FILELOG"] = "1"
+import kivy.resources
+kivy.resources.install_kivy_icon = lambda: None
+
+# Set KIVY_HOME to a writable directory (optional)
+kivy_home = os.path.join(os.getcwd(), 'kivy_home')
+os.environ['KIVY_HOME'] = kivy_home
+if not os.path.exists(kivy_home):
+    os.makedirs(kivy_home)
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -17,16 +28,11 @@ from kivy.uix.image import Image
 from kivy.utils import platform
 from plyer import notification
 
-# Set KIVY_HOME to a writable directory
-kivy_home = os.path.join(os.getcwd(), 'kivy_home')
-os.environ['KIVY_HOME'] = kivy_home
-if not os.path.exists(kivy_home):
-    os.makedirs(kivy_home)
-
 # Request storage permissions on Android
 if platform == 'android':
     from android.permissions import request_permissions, Permission
     request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+
 
 class AttendanceCalendar(BoxLayout):
     def __init__(self, **kwargs):
@@ -249,21 +255,23 @@ class AttendanceApp(App):
                 print(f"File {file_path} deleted at {current_time.strftime('%Y-%m-%d %H:%M:%S IST')}")
             else:
                 print("File not found!")
-        threading.Thread(target=self.schedule_notification, daemon=True)
- 
+
+        threading.Thread(target=self.schedule_notification, daemon=True).start()
+        return AttendanceCalendar()  # <-- Missing in your code
 
     def schedule_notification(self):
         while True:
             current_hour = datetime.now().hour
-            if current_hour == 8:  # 8 AM Morning Reminder
+            if current_hour == 8:
                 notification.notify(
                     title="Attendance Reminder",
                     message="Update your attendance for today!",
                     timeout=10
                 )
-                time.sleep(86400)  # Wait 24 hours for next notification
+                time.sleep(86400)
             else:
-                time.sleep(3600)  # Check every hour
+                time.sleep(3600)
+
 
 if __name__ == "__main__":
     AttendanceApp().run()
