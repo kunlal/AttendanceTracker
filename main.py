@@ -26,6 +26,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.image import Image
 from kivy.utils import platform
+from kivy.resources import resource_find
 from plyer import notification
 
 # Request storage permissions on Android
@@ -57,8 +58,13 @@ class AttendanceCalendar(BoxLayout):
 
     def create_calendar(self):
         self.clear_widgets()
-
-        img = Image(source='attendance.jpg', size_hint=(1, 0.6))
+        image_path = resource_find('attendance.jpg')
+        if image_path:
+            img = Image(source=image_path, size_hint=(1, 0.6))
+        else:
+            # Fallback if the image is missing; avoids crash and informs user
+            img = Label(text="[Image not found]", size_hint=(1, 0.6))
+        
         self.add_widget(img)
 
         self.add_widget(Label(text=f"{datetime(self.current_year, self.current_month, 1):%B %Y}", size_hint=(1, 0.3)))
