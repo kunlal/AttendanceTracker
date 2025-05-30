@@ -175,6 +175,7 @@ class AttendanceCalendar(BoxLayout):
             self.save_data()
             self.update_attendance_summary()
             self.create_calendar()
+            print("Test Code")
             popup.dismiss()
         except Exception as e:
             logging.error(f"Failed to update attendance: {e}")
